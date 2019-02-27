@@ -1,0 +1,38 @@
+﻿{
+  "runtime": "Default",
+  "defaultVariables": "ClientPath=./fastfill",
+  "swaggerGenerator": {
+    "fromSwagger": {
+      "url": "$(ClientPath)/swagger.json"
+    }
+  },
+  "codeGenerators": {
+    "swaggerToCSharpClient": {
+      "namespace": "$(RootNamespace).Fastfill",
+      "className": "Client",
+      "clientBaseClass": "ClientBase",
+      "configurationClass": "Configuration",
+      "generateClientClasses": true,
+      "generateClientInterfaces": true,
+      "generateDefaultValues": true,
+      "generateDataAnnotations": false,
+      "generateDtoTypes": true,
+      "generateSyncMethods": false,
+      "generateBaseUrlProperty": true,
+      "generateJsonMethods": false,
+      "useBaseUrl": false,
+      "injectHttpClient": true,
+      "disposeHttpClient": false,
+      "additionalNamespaceUsages": [
+        "Jumio.Api",
+        "System.Collections.Generic",
+        "System.Net.Http"
+      ],
+      "httpClientType": "HttpClient",
+      "arrayType": "IList",
+      "arrayInstanceType": "List",
+      "arrayBaseType": "List",
+      "output": "$(ClientPath)/Client.generated.cs"
+    }
+  }
+}

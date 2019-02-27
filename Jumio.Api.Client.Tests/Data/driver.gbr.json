@@ -1,0 +1,29 @@
+{
+    "timestamp": "2019-01-12T13:28:57.307Z",
+    "scanReference": "b7062aa2-3068-4ced-b75f-65a0606c143f",
+    "document": {
+        "type": "DRIVING_LICENSE",
+        "address": {
+            "country": "GBR",
+            "line1": "50 BRIARDENE CLOSE",
+            "city": "SUNDERLAND",
+            "postalCode": "SR3 3RU"
+        },
+        "dob": "1970-09-20",
+        "expiry": "2027-03-31",
+        "firstName": "AHMED",
+        "issuingCountry": "GBR",
+        "lastName": "ELMARAKBI",
+        "number": "ELMAR709200A99LR07",
+        "status": "APPROVED_VERIFIED"
+    },
+    "transaction": {
+        "date": "2019-01-12T13:26:52.583Z",
+        "merchantScanReference": "79eaa575-ca41-4b35-9790-7319e455665b",
+        "source": "API",
+        "status": "DONE"
+    },
+    "verification": {
+        "mrzCheck": "NOT_AVAILABLE"
+    }
+}

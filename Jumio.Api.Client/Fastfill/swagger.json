@@ -1,0 +1,188 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "FastFill API",
+    "description": "",
+    "version": "1.0.0",
+    "termsOfService": ""
+  },
+  "servers": [
+    {
+      "url": "https://lon.netverify.com",
+      "description": "Netverify EU REST"
+    },
+    {
+      "url": "https://netverify.com",
+      "description": "Netverify US REST"
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "DocumentType": {
+        "type": "string",
+        "enum": [ "UNDEFINED", "PASSPORT", "ID_CARD", "DRIVING_LICENSE" ]
+      },
+      "Metadata": {
+        "type": "object",
+        "required": [
+          "type",
+          "country"
+        ],
+        "properties": {
+          "type": {
+            "schema": {
+              "$ref": "#/components/schemas/DocumentType"
+            }
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-3"
+          }
+        }
+      },
+      "DocumentData": {
+        "type": "object",
+        "required": [
+          "scanReference"
+        ],
+        "properties": {
+          "scanReference": {
+            "type": "string"
+          },
+          "type": {
+            "schema": {
+              "$ref": "#/components/schemas/DocumentType"
+            }
+          },
+          "issueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "issuingCountry": {
+            "type": "string"
+          },
+          "originatingCountry": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date"
+          },
+          "expiry": {
+            "type": "string",
+            "format": "date"
+          },
+          "optionalData1": {
+            "type": "string"
+          },
+          "optionalData2": {
+            "type": "string"
+          },
+          "personalNumber": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "M",
+              "F"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/netverify/v2/fastfill": {
+      "post": {
+        "summary": "Submit front and/or back side image(s) of the user's document and you will immediately receive the ID information as a JSON response.",
+        "operationId": "Submit",
+        "tags": [
+          "fastfill"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "metadata"
+                ],
+                "properties": {
+                  "metadata": {
+                    "$ref": "#/components/schemas/Metadata"
+                  },
+                  "frontsideImage": {
+                    "type": "file",
+                    "description": "Mandatory if type = PASSPORT or if type = ID_CARD or DRIVING_LICENSE and backsideImage not provided",
+                    "format": "binary"
+                  },
+                  "backsideImage": {
+                    "type": "file",
+                    "description": "Mandatory if frontsideImage not provided",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "frontsideImage": {
+                  "contentType": "image/png, image/jpeg"
+                },
+                "backsideImage": {
+                  "contentType": "image/png, image/jpeg"
+                },
+                "metadata": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentData"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

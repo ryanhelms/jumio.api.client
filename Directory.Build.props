@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup Label="Common">
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <IsPackable>False</IsPackable>
+    <LangVersion>Latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Label="Package">
+    <ApplicationVersion>$(Version)</ApplicationVersion>
+    <VersionPrefix>1.0.15</VersionPrefix>
+    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
+    <PackageOutputPath>$(SolutionDir).packages</PackageOutputPath>
+    <Description>Jumio API Client.</Description>
+    <Authors>Leonid Efremov</Authors>
+    <PackageVersion>$(Version)</PackageVersion>
+    <PackageTags>api;jumio;client</PackageTags>
+    <IncludeSymbols>False</IncludeSymbols>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,1974 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Netverify Web v4 API",
+		"description": "",
+		"version": "1.0.0",
+		"termsOfService": ""
+	},
+	"servers": [
+		{
+			"url": "https://lon.netverify.com",
+			"description": "Netverify EU REST"
+		},
+		{
+			"url": "https://netverify.com",
+			"description": "Netverify US REST"
+		}
+	],
+	"security": [
+		{
+			"basicAuth": []
+		}
+	],
+	"components": {
+		"securitySchemes": {
+			"basicAuth": {
+				"type": "http",
+				"scheme": "basic"
+			}
+		},
+		"parameters": {
+			"scanReference": {
+				"in": "path",
+				"description": "Reference to a specific scan for retrieving or deleting",
+				"name": "scanReference",
+				"required": true,
+				"schema": {
+					"type": "string",
+					"nullable": false,
+					"format": "uuid"
+				}
+			},
+			"classifier": {
+				"in": "path",
+				"description": "Classifies type of image to retrieve",
+				"required": true,
+				"name": "classifier",
+				"schema": {
+					"type": "string",
+					"nullable": false,
+					"enum": [
+						"UNDEFINED",
+						"front",
+						"face",
+						"back"
+					]
+				}
+			},
+			"maskhint": {
+				"in": "query",
+				"description": "To receive the unmasked credit card image, append the query parameter maskhint=unmasked. By default, retrieval of unmasked credit card images is disabled (HTTP status code 403 Forbidden). If you want to enable it please contact Jumio Support. Retrieving unmasked credit card images might impose additional security requirements on your systems depending if you already store/transmit/process credit card data on your systems",
+				"required": false,
+				"name": "maskhint",
+				"schema": {
+					"type": "string",
+					"enum": [
+						"UNDEFINED",
+						"masked",
+						"unmasked"
+					]
+				}
+			}
+		},
+		"schemas": {
+			"UserSettings": {
+				"type": "object",
+				"required": [
+					"customerInternalReference",
+					"userReference"
+				],
+				"properties": {
+					"customerInternalReference": {
+						"type": "string",
+						"maxLength": 100
+					},
+					"userReference": {
+						"type": "string",
+						"maxLength": 100
+					},
+					"reportingCriteria": {
+						"type": "string",
+						"maxLength": 100
+					},
+					"successUrl": {
+						"type": "string",
+						"maxLength": 2047
+					},
+					"errorUrl": {
+						"type": "string",
+						"maxLength": 255
+					},
+					"callbackUrl": {
+						"type": "string",
+						"maxLength": 255
+					},
+					"workflowId": {
+						"type": "integer",
+						"description": "Acquisition workflows allow you to set a combination of verification and capture method options",
+						"enum": [
+							0,
+							100,
+							101,
+							102,
+							200,
+							201,
+							202
+						]
+					},
+					"presets": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Preset"
+						}
+					},
+					"locale": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"bg",
+							"cs",
+							"da",
+							"de",
+							"el",
+							"en",
+							"en-GB",
+							"es",
+							"es-MX",
+							"et",
+							"fi",
+							"fr",
+							"hu",
+							"it",
+							"ja",
+							"ko",
+							"lt",
+							"nl",
+							"no",
+							"pl",
+							"pt",
+							"pt-BR",
+							"ro",
+							"ru",
+							"sk",
+							"sv",
+							"tr",
+							"vl",
+							"zh-CN",
+							"zh-HK"
+						]
+					},
+					"tokenLifetimeInMinutes": {
+						"type": "number",
+						"maximum": 86400
+					}
+				}
+			},
+			"Preset": {
+				"type": "object",
+				"description": "For ID verification: index is 1, required fields are country and type; for identify verification index is 2 and required field is phrase ",
+				"required": [
+					"index"
+				],
+				"properties": {
+					"index": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 2
+					},
+					"country": {
+						"type": "string",
+						"maxLength": 3,
+						"example": "XKX"
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"PASSPORT",
+							"DRIVING_LICENSE",
+							"ID_CARD"
+						]
+					},
+					"phrase": {
+						"type": "string",
+						"maxLength": 30
+					}
+				}
+			},
+			"ConnectionSettings": {
+				"type": "object",
+				"description": "JSON object containing the information about connection.",
+				"properties": {
+					"timestamp": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"redirectUrl": {
+						"type": "string",
+						"description": "URL used to load the Netverify client."
+					},
+					"transactionReference": {
+						"type": "string",
+						"description": "Jumio reference number for the transaction.",
+						"format": "uuid"
+					}
+				}
+			},
+			"UploadScan": {
+				"type": "object",
+				"required": [
+					"merchantIdScanReference",
+					"faceImage",
+					"country",
+					"idType"
+				],
+				"properties": {
+					"merchantIdScanReference": {
+						"type": "string",
+						"maxLength": 100,
+						"description": "Your reference for each scan must not contain sensitive data like PII (Personally Identifiable Information) or account login"
+					},
+					"frontsideImage": {
+						"type": "string",
+						"description": "Base64 encoded image of ID front side"
+					},
+					"faceImage": {
+						"type": "string",
+						"description": "Mandatory if Face match enabled. Base64 encoded image of face"
+					},
+					"country": {
+						"type": "string",
+						"description": "Possible countries: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3"
+					},
+					"idType": {
+						"type": "string",
+						"name": "idType",
+						"enum": [
+							"UNDEFINED",
+							"PASSPORT",
+							"DRIVING_LICENSE",
+							"ID_CARD",
+							"VISA"
+						]
+					},
+					"frontsideImageMimeType": {
+						"type": "string",
+						"description": "Mime type of front side image",
+						"enum": [
+							"UNDEFINED",
+							"image/jpeg",
+							"image/png"
+						]
+					},
+					"faceImageMimeType": {
+						"type": "string",
+						"description": "Mime type of face image",
+						"enum": [
+							"UNDEFINED",
+							"image/jpeg",
+							"image/png"
+						]
+					},
+					"backsideImage": {
+						"type": "string",
+						"description": "Base64 encoded image of ID back side"
+					},
+					"backsideImageMimeType": {
+						"type": "string",
+						"description": "Mime type of back side image",
+						"enum": [
+							"UNDEFINED",
+							"image/jpeg",
+							"image/png"
+						]
+					},
+					"enabledFields": {
+						"type": "string",
+						"description": "Defines fields which will be extracted during the ID verification. If a field is not listed in this parameter, it will not be processed for this transaction, regardless of customer portal settings. Note: Face match and Address extraction will not be processed unless enabled for your account. If you want to enable them, please contact your Customer Success Manager, or reach out to Jumio Support."
+					},
+					"merchantReportingCriteria": {
+						"type": "string",
+						"description": "Your reporting criteria for each scan"
+					},
+					"customerId": {
+						"type": "string",
+						"description": "Identification of the customer must not contain sensitive data like PII (Personally Identificable Information) or account login"
+					},
+					"callbackUrl": {
+						"type": "string",
+						"description": "Callback URL for the confirmation after the verification is completed"
+					},
+					"firstName": {
+						"type": "string",
+						"description": "First name of the customer"
+					},
+					"lastName": {
+						"type": "string",
+						"description": "Last name of the customer"
+					},
+					"usState": {
+						"type": "string"
+					},
+					"expiry": {
+						"type": "string",
+						"description": "Date of expiry in the format YYYY-MM-DD",
+						"format": "date"
+					},
+					"number": {
+						"type": "string",
+						"description": "Identification number of the document"
+					},
+					"dob": {
+						"type": "string",
+						"description": "Date of birth in the format YYYY-MM-DD",
+						"format": "date"
+					},
+					"callbackGranularity": {
+						"type": "string",
+						"description": "Possible values: onFinish (default): Callback is only sent after the whole verification; onAllSteps: Additional callback is sent when the images are received",
+						"enum": [
+							"UNDEFINED",
+							"onFinish",
+							"onAllSteps"
+						]
+					},
+					"personalNumber": {
+						"type": "string",
+						"description": "Personal number of the document"
+					}
+				}
+			},
+			"ScanReference": {
+				"type": "object",
+				"properties": {
+					"timestamp": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"jumioIdScanReference": {
+						"type": "string",
+						"format": "uuid",
+						"description": "Jumio's reference number for each scan"
+					}
+				}
+			},
+			"CommonDocumentModel": {
+				"type": "object",
+				"required": [
+					"timestamp",
+					"scanReference"
+				],
+				"properties": {
+					"timestamp": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"scanReference": {
+						"type": "string",
+						"format": "uuid",
+						"description": "Jumio's reference number for each scan"
+					}
+				}
+			},
+			"ScanStatus": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					},
+					{
+						"type": "object",
+						"properties": {
+							"status": {
+								"type": "string",
+								"enum": [
+									"UNDEFINED",
+									"PENDING",
+									"DONE",
+									"FAILED"
+								]
+							}
+						}
+					}
+				]
+			},
+			"ScanDetails": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					},
+					{
+						"type": "object",
+						"required": [
+							"document",
+							"transaction"
+						],
+						"properties": {
+							"document": {
+								"$ref": "#/components/schemas/ScanDocumentDataOnly"
+							},
+							"transaction": {
+								"$ref": "#/components/schemas/ScanTransactionDataOnly"
+							},
+							"verification": {
+								"$ref": "#/components/schemas/ScanVerificationDataOnly"
+							}
+						}
+					}
+				]
+			},
+			"ScanDocumentDataOnly": {
+				"type": "object",
+				"required": [
+					"status"
+				],
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"APPROVED_VERIFIED",
+							"DENIED_FRAUD",
+							"DENIED_UNSUPPORTED_ID_TYPE",
+							"DENIED_UNSUPPORTED_ID_COUNTRY",
+							"ERROR_NOT_READABLE_ID",
+							"NO_ID_UPLOADED"
+						]
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"PASSPORT",
+							"DRIVING_LICENSE",
+							"ID_CARD",
+							"VISA",
+							"UNSUPPORTED"
+						]
+					},
+					"idSubtype": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"NATIONAL_ID",
+							"CONSULAR_ID",
+							"ELECTORAL_ID",
+							"RESIDENT_PERMIT_ID",
+							"TAX_ID",
+							"STUDENT_ID",
+							"PASSPORT_CARD_ID",
+							"MILITARY_ID",
+							"PUBLIC_SAFETY_ID",
+							"OTHER_ID",
+							"VISA",
+							"UNKNOWN"
+						]
+					},
+					"issuingCountry": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"dob": {
+						"type": "string",
+						"format": "date"
+					},
+					"expiry": {
+						"type": "string",
+						"format": "date"
+					},
+					"issuingDate": {
+						"type": "string",
+						"format": "date"
+					},
+					"number": {
+						"type": "string"
+					},
+					"usState": {
+						"type": "string"
+					},
+					"personalNumber": {
+						"type": "string"
+					},
+					"optionalData1": {
+						"type": "string"
+					},
+					"optionalData2": {
+						"type": "string"
+					},
+					"address": {
+						"$ref": "#/components/schemas/AddressModel"
+					},
+					"issuingAuthority": {
+						"type": "string"
+					},
+					"issuingPlace": {
+						"type": "string"
+					}
+				}
+			},
+			"AddressModel": {
+				"type": "string"
+			},
+			"USAddressFormat": {
+				"type": "object",
+				"properties": {
+					"city": {
+						"type": "string"
+					},
+					"stateCode": {
+						"type": "string",
+						"description": "ISO 3166-2"
+					},
+					"streetName": {
+						"type": "string"
+					},
+					"streetSuffix": {
+						"type": "string",
+						"description": "Street suffix abbreviation"
+					},
+					"streetDirection": {
+						"type": "string",
+						"description": "Street direction abbreviation"
+					},
+					"streetNumber": {
+						"type": "string"
+					},
+					"unitDesignator": {
+						"type": "string",
+						"description": "Unit designator abbreviation. Examples: US, Canada, Australia "
+					},
+					"unitNumber": {
+						"type": "string"
+					},
+					"zip": {
+						"type": "string"
+					},
+					"zipExtension": {
+						"type": "string"
+					},
+					"country": {
+						"type": "string",
+						"description": "ISO 3166-1 alpha-3"
+					}
+				}
+			},
+			"EUAddressFormat": {
+				"type": "object",
+				"properties": {
+					"city": {
+						"type": "string"
+					},
+					"province": {
+						"type": "string"
+					},
+					"streetName": {
+						"type": "string"
+					},
+					"streetNumber": {
+						"type": "string"
+					},
+					"unitDetails": {
+						"type": "string"
+					},
+					"postalCode": {
+						"type": "string"
+					},
+					"country": {
+						"type": "string",
+						"description": "ISO 3166-1 alpha-3"
+					}
+				}
+			},
+			"RawAddressFormat": {
+				"type": "object",
+				"properties": {
+					"line1": {
+						"type": "string"
+					},
+					"line2": {
+						"type": "string"
+					},
+					"line3": {
+						"type": "string"
+					},
+					"line4": {
+						"type": "string"
+					},
+					"line5": {
+						"type": "string"
+					},
+					"postalCode": {
+						"type": "string"
+					},
+					"country": {
+						"type": "string",
+						"description": "ISO 3166-1 alpha-3"
+					},
+					"city": {
+						"type": "string"
+					}
+				}
+			},
+			"ScanTransactionDataOnly": {
+				"type": "object",
+				"required": [
+					"status",
+					"source",
+					"date"
+				],
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"PENDING",
+							"DONE",
+							"FAILED"
+						]
+					},
+					"source": {
+						"type": "string"
+					},
+					"date": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"clientIp": {
+						"type": "string"
+					},
+					"customerId": {
+						"type": "string"
+					},
+					"merchantScanReference": {
+						"type": "string"
+					},
+					"merchantReportingCriteria": {
+						"type": "string"
+					}
+				}
+			},
+			"ScanVerificationDataOnly": {
+				"type": "object",
+				"properties": {
+					"mrzCheck": {
+						"type": "string"
+					},
+					"rejectReason": {
+						"$ref": "#/components/schemas/RejectReason"
+					},
+					"identityVerification": {
+						"$ref": "#/components/schemas/IdentifyVerification"
+					}
+				}
+			},
+			"RejectReason": {
+				"type": "object",
+				"properties": {
+					"rejectReasonCode": {
+						"type": "string"
+					},
+					"rejectReasonDescription": {
+						"type": "string"
+					},
+					"rejectReasonDetails": {
+						"$ref": "#/components/schemas/RejectReasonDetails"
+					}
+				}
+			},
+			"RejectReasonDetails": {
+				"type": "object",
+				"properties": {
+					"detailsCode": {
+						"type": "string"
+					},
+					"detailsDescription": {
+						"type": "string"
+					}
+				}
+			},
+			"IdentifyVerification": {
+				"type": "object",
+				"properties": {
+					"similarity": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"MATCH",
+							"NO_MATCH",
+							"NOT_POSSIBLE"
+						]
+					},
+					"validity": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"TRUE",
+							"FALSE"
+						]
+					},
+					"reason": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"SELFIE_CROPPED_FROM_ID",
+							"ENTIRE_ID_USED_AS_SELFIE",
+							"MULTIPLE_PEOPLE",
+							"SELFIE_IS_SCREEN_PAPER_VIDEO",
+							"SELFIE_MANIPULATED",
+							"AGE_DIFFERENCE_TOO_BIG",
+							"NO_FACE_PRESENT",
+							"FACE_NOT_FULLY_VISIBLE",
+							"BAD_QUALITY",
+							"BLACK_AND_WHITE"
+						]
+					},
+					"handwrittenNoteMatches": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"TRUE",
+							"FALSE"
+						]
+					}
+				}
+			},
+			"ScanDocumentData": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					},
+					{
+						"$ref": "#/components/schemas/ScanDocumentDataOnly"
+					}
+				]
+			},
+			"ScanTransactionData": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					},
+					{
+						"$ref": "#/components/schemas/ScanTransactionDataOnly"
+					}
+				]
+			},
+			"ScanVerificationData": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					},
+					{
+						"$ref": "#/components/schemas/ScanVerificationDataOnly"
+					}
+				]
+			},
+			"Images": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					},
+					{
+						"type": "object",
+						"properties": {
+							"images": {
+								"type": "array",
+								"items": {
+									"$ref": "#/components/schemas/Image"
+								}
+							}
+						}
+					}
+				]
+			},
+			"Image": {
+				"type": "object",
+				"required": [
+					"classifier",
+					"href"
+				],
+				"properties": {
+					"classifier": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"front",
+							"face",
+							"back"
+						]
+					},
+					"href": {
+						"type": "string"
+					},
+					"maskhint": {
+						"type": "string"
+					}
+				}
+			},
+			"DocumentStatus": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					},
+					{
+						"type": "object",
+						"properties": {
+							"status": {
+								"type": "string",
+								"enum": [
+									"UNDEFINED",
+									"DONE",
+									"FAILED"
+								]
+							}
+						}
+					}
+				]
+			},
+			"DocumentDetails": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					},
+					{
+						"type": "object",
+						"required": [
+							"document",
+							"transaction"
+						],
+						"properties": {
+							"document": {
+								"$ref": "#/components/schemas/DocDocumentDataOnly"
+							},
+							"transaction": {
+								"$ref": "#/components/schemas/DocTransactionDataOnly"
+							}
+						}
+					}
+				]
+			},
+			"DocDocumentDataOnly": {
+				"type": "object",
+				"required": [
+					"status"
+				],
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"UPLOADED",
+							"EXTRACTED",
+							"DISCARDED"
+						]
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"CC",
+							"BS",
+							"IC",
+							"UB",
+							"CAAP",
+							"CRC",
+							"CCS",
+							"LAG",
+							"LOAP",
+							"MOAP",
+							"TR",
+							"VT",
+							"VC",
+							"STUC",
+							"HCC",
+							"CB",
+							"SENC",
+							"MEDC",
+							"BC",
+							"WWCC",
+							"SS",
+							"TAC",
+							"SEL",
+							"PB",
+							"USSS",
+							"SSC",
+							"CUSTOM"
+						]
+					},
+					"country": {
+						"type": "string"
+					},
+					"originalDocument": {
+						"type": "string"
+					},
+					"customDocumentCode": {
+						"type": "string"
+					},
+					"extractedData": {
+						"$ref": "#/components/schemas/ExtractedData"
+					}
+				}
+			},
+			"ExtractedData": {
+				"type": "object",
+				"properties": {
+					"signatureAvailable": {
+						"type": "string",
+						"description": "'true' if signature available, otherwise 'false'"
+					},
+					"ssn": {
+						"type": "string",
+						"description": "Social security number if readable"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"swiftCode": {
+						"type": "string",
+						"description": "BIC/SWIFT code"
+					}
+				}
+			},
+			"DocTransactionDataOnly": {
+				"type": "object",
+				"required": [
+					"status",
+					"source"
+				],
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"DONE",
+							"FAILED"
+						]
+					},
+					"source": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"DOC_API",
+							"DOC_UPLOAD"
+						]
+					},
+					"customerId": {
+						"type": "string"
+					},
+					"merchantScanReference": {
+						"type": "string"
+					},
+					"merchantReportingCriteria": {
+						"type": "string"
+					}
+				}
+			},
+			"DocDocumentData": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					},
+					{
+						"$ref": "#/components/schemas/DocDocumentDataOnly"
+					}
+				]
+			},
+			"DocTransactionData": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					},
+					{
+						"$ref": "#/components/schemas/DocTransactionDataOnly"
+					}
+				]
+			},
+			"CallbackModel": {
+				"type": "object",
+				"required": [
+					"callBackType",
+					"jumioIdScanReference",
+					"verificationStatus",
+					"idScanStatus",
+					"idScanSource",
+					"idCheckDataPositions",
+					"idCheckDocumentValidation",
+					"idCheckHologram",
+					"idCheckMRZcode",
+					"idCheckMicroprint",
+					"idCheckSecurityFeatures",
+					"idCheckSignature",
+					"transactionDate",
+					"callbackDate"
+				],
+				"properties": {
+					"callBackType": {
+						"type": "string"
+					},
+					"jumioIdScanReference": {
+						"type": "string",
+						"format": "uuid",
+						"nullable": true
+					},
+					"verificationStatus": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"APPROVED_VERIFIED",
+							"DENIED_FRAUD",
+							"DENIED_UNSUPPORTED_ID_TYPE",
+							"DENIED_UNSUPPORTED_ID_COUNTRY",
+							"ERROR_NOT_READABLE_ID",
+							"NO_ID_UPLOADED"
+						]
+					},
+					"idScanStatus": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"SUCCESS",
+							"ERROR"
+						]
+					},
+					"idScanSource": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"WEB",
+							"WEB_CAM",
+							"WEB_UPLOAD",
+							"REDIRECT",
+							"REDIRECT_CAM",
+							"REDIRECT_UPLOAD",
+							"API",
+							"SDK"
+						]
+					},
+					"idCheckDataPositions": {
+						"type": "string",
+            "nullable": true
+					},
+					"idCheckDocumentValidation": {
+						"type": "string",
+            "nullable": true
+					},
+					"idCheckHologram": {
+						"type": "string",
+            "nullable": true
+					},
+					"idCheckMRZcode": {
+						"type": "string",
+            "nullable": true
+					},
+					"idCheckMicroprint": {
+						"type": "string",
+            "nullable": true
+					},
+					"idCheckSecurityFeatures": {
+						"type": "string",
+            "nullable": true
+					},
+					"idCheckSignature": {
+						"type": "string",
+            "nullable": true
+					},
+					"transactionDate": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"callbackDate": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"identityVerification": {
+            "type": "string"
+					},
+					"idType": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"PASSPORT",
+							"DRIVING_LICENSE",
+							"ID_CARD",
+							"VISA"
+						]
+					},
+					"idSubtype": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"NATIONAL_ID",
+							"CONSULAR_ID",
+							"ELECTORAL_ID",
+							"RESIDENT_PERMIT_ID",
+							"TAX_ID",
+							"STUDENT_ID",
+							"PASSPORT_CARD_ID",
+							"MILITARY_ID",
+							"PUBLIC_SAFETY_ID",
+							"OTHER_ID",
+							"VISA",
+							"UNKNOWN",
+							"LEARNING_DRIVING_LICENSE",
+							"E_PASSPORT"
+						]
+					},
+					"idCountry": {
+						"type": "string"
+					},
+					"rejectReason": {
+						"$ref": "#/components/schemas/RejectReason"
+					},
+					"idScanImage": {
+						"type": "string",
+						"format": "uri"
+					},
+					"idScanImageFace": {
+						"type": "string",
+						"format": "uri"
+					},
+					"idScanImageBackside": {
+						"type": "string",
+						"format": "uri"
+					},
+					"idNumber": {
+						"type": "string"
+					},
+					"idFirstName": {
+						"type": "string"
+					},
+					"idLastName": {
+						"type": "string"
+					},
+					"idDob": {
+						"type": "string"
+					},
+					"idExpiry": {
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					},
+					"idUsState": {
+						"type": "string"
+					},
+					"personalNumber": {
+						"type": "string"
+					},
+					"idAddress": {
+						"$ref": "#/components/schemas/AddressModel"
+					},
+					"merchantIdScanReference": {
+						"type": "string"
+					},
+					"merchantReportingCriteria": {
+						"type": "string"
+					},
+					"customerId": {
+						"type": "string"
+					},
+					"clientIp": {
+						"type": "string"
+					},
+					"firstAttemptDate": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"optionalData1": {
+						"type": "string"
+					},
+					"optionalData2": {
+						"type": "string"
+					},
+					"dni": {
+						"type": "string"
+					},
+					"curp": {
+						"type": "string"
+					},
+					"gender": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"M",
+							"F"
+						]
+					},
+					"presetCountry": {
+						"type": "string"
+					},
+					"presetIdType": {
+						"type": "string"
+					},
+					"dlCarPermission": {
+						"type": "string"
+					},
+					"dlCategories": {
+						"$ref": "#/components/schemas/DriverLicense"
+					},
+					"nationality": {
+						"type": "string"
+					},
+					"passportNumber": {
+						"type": "string"
+					},
+					"durationOfStay": {
+						"type": "string"
+					},
+					"numberOfEntries": {
+						"type": "string"
+					},
+					"visaCategory": {
+						"type": "string"
+					},
+					"originDob": {
+						"type": "string"
+					},
+					"issuingAuthority": {
+						"type": "string"
+					},
+					"issuingDate": {
+						"type": "string"
+					},
+					"issuingPlace": {
+						"type": "string"
+					},
+					"livenessImages": {
+						"type": "string"
+					}
+				}
+			},
+			"CallbackIdentityVerification": {
+				"type": "object",
+				"properties": {
+					"similarity": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"MATCH",
+							"NO_MATCH",
+							"NOT_POSSIBLE"
+						]
+					},
+					"validity": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"reason": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"SELFIE_CROPPED_FROM_ID",
+							"ENTIRE_ID_USED_AS_SELFIE",
+							"MULTIPLE_PEOPLE",
+							"SELFIE_IS_SCREEN_PAPER_VIDEO",
+							"SELFIE_MANIPULATED",
+							"AGE_DIFFERENCE_TOO_BIG",
+							"NO_FACE_PRESENT",
+							"FACE_NOT_FULLY_VISIBLE",
+							"BAD_QUALITY",
+							"BLACK_AND_WHITE"
+						]
+					},
+					"handwrittenNoteMatches": {
+						"type": "boolean",
+						"nullable": true
+					}
+				}
+			},
+			"DriverLicense": {
+				"type": "object",
+				"properties": {
+					"category": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"B1",
+							"B",
+							"BE"
+						]
+					},
+					"issueDate": {
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					},
+					"expiryDate": {
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					},
+					"isReadable": {
+						"type": "boolean",
+						"nullable": true
+					}
+				}
+			},
+			"DocVerificationCallback": {
+				"allOf": [
+					{
+						"type": "object",
+						"required": [
+							"transaction"
+						],
+						"properties": {
+							"transaction": {
+								"$ref": "#/components/schemas/CallbackTransaction"
+							},
+							"document": {
+								"$ref": "#/components/schemas/CallbackDocument"
+							}
+						}
+					},
+					{
+						"$ref": "#/components/schemas/CommonDocumentModel"
+					}
+				]
+			},
+			"CallbackTransaction": {
+				"type": "object",
+				"required": [
+					"date",
+					"status",
+					"source",
+					"merchantScanReference",
+					"customerId"
+				],
+				"properties": {
+					"date": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"DONE",
+							"FAILED"
+						]
+					},
+					"source": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"DOC_UPLOAD",
+							"DOC_API",
+							"DOC_SDK"
+						]
+					},
+					"merchantScanReference": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"customerId": {
+						"type": "string"
+					},
+					"merchantReportingCriteria": {
+						"type": "string",
+						"description": "Your reporting criteria for each scan"
+					},
+					"clientIp": {
+						"type": "string",
+						"format": "uri",
+						"description": "IP address of the client if provided for the Document Verification API"
+					}
+				}
+			},
+			"CallbackDocument": {
+				"type": "object",
+				"required": [
+					"status",
+					"country",
+					"type",
+					"images"
+				],
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"UPLOADED",
+							"EXTRACTED",
+							"DISCARDED"
+						]
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"UNDEFINED",
+							"CC",
+							"BS",
+							"IC",
+							"UB",
+							"CAAP",
+							"CRC",
+							"CCS",
+							"LAG",
+							"LOAP",
+							"MOAP",
+							"TR",
+							"VT",
+							"VC",
+							"STUC",
+							"HCC",
+							"CB",
+							"SENC",
+							"MEDC",
+							"BC",
+							"WWCC",
+							"SS",
+							"TAC",
+							"SEL",
+							"PB",
+							"USSS",
+							"SSC",
+							"CUSTOM"
+						]
+					},
+					"images": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"format": "uri"
+						}
+					},
+					"country": {
+						"type": "string"
+					},
+					"originalDocument": {
+						"type": "string",
+						"format": "uri"
+					},
+					"customDocumentCode": {
+						"type": "string"
+					},
+					"extractedData": {
+						"$ref": "#/components/schemas/CallbackExtractedData"
+					}
+				}
+			},
+			"CallbackExtractedData": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/ExtractedData"
+					},
+					{
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "Full name if readable"
+							},
+							"accountNumber": {
+								"type": "string",
+								"description": "Bank account number of the customer from a bank statement"
+							},
+							"pan": {
+								"type": "string",
+								"description": "Personal account number of credit card"
+							},
+							"issueDate": {
+								"type": "string",
+								"format": "date",
+								"description": "Issue date in the format YYYY-MM-DD",
+								"nullable": true
+							},
+							"expiryDate": {
+								"type": "string",
+								"format": "date",
+								"description": "Date of expiry in the format YYYY-MM-DD",
+								"nullable": true
+							},
+							"ssn": {
+								"type": "string",
+								"description": "Social security number if readable"
+							},
+							"address": {
+								"$ref": "#/components/schemas/AddressModel"
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"paths": {
+		"/api/v4/initiate": {
+			"post": {
+				"summary": "Create a transaction for user",
+				"operationId": "Initiate",
+				"tags": [
+					"netverify"
+				],
+				"requestBody": {
+					"description": "The body of your initiate API request allows you to: specify what user information is captured and by which method; indicate where the user should be directed after the user journey; provide your own internal tracking information for the user and transaction; select the language to be displayed; preset options to enhance the user journey.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserSettings"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ConnectionSettings"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/performNetverify": {
+			"post": {
+				"summary": "Offers a Restful ID verification API without Jumio-hosted user interface.",
+				"operationId": "Submit",
+				"description": "Simply send an HTTP POST including the customer's ID image to the URL below. You will immediately receive a JSON response with a Jumio scan reference and a timestamp. A callback will be sent after the verification is complete",
+				"tags": [
+					"netverify"
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UploadScan"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ScanReference"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/scans/{scanReference}": {
+			"get": {
+				"summary": "Receive the status of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetScanStatus",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ScanStatus"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"summary": "Removes sensitive data and image(s) of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "DeleteScan",
+				"tags": [
+					"deleteScan",
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/scans/{scanReference}/data": {
+			"get": {
+				"summary": "Receive document, transaction and verification details of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetScanData",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ScanDetails"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/scans/{scanReference}/data/document": {
+			"get": {
+				"summary": "Receive document related data of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetScanDocumentDataOnly",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ScanDocumentData"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/scans/{scanReference}/data/transaction": {
+			"get": {
+				"summary": "Receive transaction related data of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetScanTransactionDataOnly",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ScanTransactionData"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/scans/{scanReference}/data/verification": {
+			"get": {
+				"summary": "Receive transaction related data of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetScanVerificationDataOnly",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ScanVerificationData"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/scans/{scanReference}/images": {
+			"get": {
+				"summary": "Receive available images of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetScanImages",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Images"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/scans/{scanReference}/images/{classifier}": {
+			"get": {
+				"summary": "Receive available images of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetScanImage",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					},
+					{
+						"$ref": "#/components/parameters/classifier"
+					},
+					{
+						"$ref": "#/components/parameters/maskhint"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"image/*": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/documents/{scanReference}": {
+			"get": {
+				"summary": "Receive the status of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetDocStatus",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DocumentStatus"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"summary": "Removes sensitive data and image(s) of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "DeleteScan",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/documents/{scanReference}/data": {
+			"get": {
+				"summary": "Receive document, transaction and verification details of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetDocumentData",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DocumentDetails"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/documents/{scanReference}/data/document": {
+			"get": {
+				"summary": "Receive document related data of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetDocumentsDocumentDataOnly",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DocDocumentData"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/documents/{scanReference}/data/transaction": {
+			"get": {
+				"summary": "Receive transaction related data of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetDocumentsTransactionDataOnly",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DocTransactionData"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/documents/{scanReference}/images": {
+			"get": {
+				"summary": "Receive available images of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetDocImages",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Images"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/netverify/v2/documents/{scanReference}/images/{classifier}": {
+			"get": {
+				"summary": "Receive available images of a scan by specifying the Jumio scan reference as a path parameter.",
+				"operationId": "GetDocImage",
+				"tags": [
+					"netverify"
+				],
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/scanReference"
+					},
+					{
+						"$ref": "#/components/parameters/classifier"
+					},
+					{
+						"$ref": "#/components/parameters/maskhint"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"image/*": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
