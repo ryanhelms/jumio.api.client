@@ -206,3 +206,4 @@ ModelManifest.xml
 # NSwag generated files
 
 *.generated.cs
+coverage.opencover.xml

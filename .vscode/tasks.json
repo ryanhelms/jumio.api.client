@@ -2,12 +2,39 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "label": "build",
             "command": "dotnet",
             "type": "process",
             "args": [
-                "build",
-                "${workspaceFolder}/Jumio.Api.Client.Tests/Jumio.Api.Client.Tests.csproj"
+                "build"
+            ],
+            "problemMatcher": "$msCompile",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "/p:CollectCoverage=true",
+                "/p:CoverletOutputFormat=opencover",
+                "/p:Exclude=[xunit*]*"
             ],
             "problemMatcher": "$msCompile"
         }
