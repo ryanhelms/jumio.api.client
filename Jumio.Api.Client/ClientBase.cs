@@ -14,10 +14,7 @@ namespace Jumio.Api
 
         internal new readonly Configuration Configuration;
 
-        internal ClientBase(Configuration configuration) : base(configuration)
-        {
-            Configuration = configuration;
-        }
+        protected ClientBase(Configuration configuration) : base(configuration) => Configuration = configuration;
 
         internal void UpdateSerializerSettings(JsonSerializerSettings settings)
         {
