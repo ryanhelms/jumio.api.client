@@ -10,7 +10,7 @@
   </PropertyGroup>
   <PropertyGroup Label="Package">
     <ApplicationVersion>$(Version)</ApplicationVersion>
-    <VersionPrefix>1.0.15</VersionPrefix>
+    <VersionPrefix>1.0.16</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <PackageOutputPath>$(SolutionDir).packages</PackageOutputPath>
     <Description>Jumio API Client.</Description>
